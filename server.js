@@ -1,50 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
+const express = require("express");
+const app = express();
+const server = require("http").Server(app);
+app.set("view engine", "ejs");
+app.use(express.static("public"));
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Video Chat App</title>
-    <link rel="stylesheet" href="style.css" />
-    <script src="https://kit.fontawesome.com/c939d0e917.js"></script>
+const io = require("socket.io")(server, {
+    cors: {
+        origin: '*'
+    }
+});
 
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+app.get("/", (req, res) => {
+    res.render("index");
+});
 
-    <!-- Socket.io -->
-    <script src="/socket.io/socket.io.js"></script>
-</head>
+io.on("connection", (socket) => {
+    socket.on("message", (message, user) => {
+        io.emit("createMessage", message, user);
+    });
+});
 
-<body>
-    <div class="row" style="overflow: hidden;">
-        <div class="col-sm-12 col-md-12 col-lg-12 text-center p-3" style="background-color: #1d2735;">
-            <div class="header_back">
-                <i class="fas fa-angle-left"></i>
-            </div>
-            <h3 class='text-white'>Chat Forum</h3>
-        </div>
-    </div>
-    <div class="row main">
-        <div class="col-sm-12 col-md-12 col-lg-12 left-window">
-            <div class="row">
-                <div class="col-sm-12 col-md-12 col-lg-12 messages" style="height: 82vh; background-color: #171e2a;">
-                    <!-- Chat Messages -->
-                </div>
-                <div class="col-sm-12 col-md-12 col-lg-12 options">
-                    <div class="main_message_container">
-                        <input id="chat_message" type="text" autocomplete="off" placeholder="Type message here...">
-                        <div id="send" class="options_button">
-                            <i class="fa fa-plus" aria-hidden="true"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</body>
-<script src="script.js"></script>
-
-</html>
+server.listen(3030);
